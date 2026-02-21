@@ -6,6 +6,9 @@ import subprocess
 from flask import Flask, request, jsonify, send_file, render_template
 from flask_cors import CORS
 import yt_dlp
+import imageio_ffmpeg
+
+FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
 
 
 def _strip_ansi(text: str) -> str:
@@ -224,8 +227,8 @@ def download_video():
             "noplaylist": True,
             "format": "bestaudio/best",
             "outtmpl": output_template,
-            "ffmpeg_location": os.path.join(BASE_DIR, "ffmpeg"),
-            "extractor_args": {"youtube": {"player_client": ["android", "ios", "android_vr"]}},
+            "ffmpeg_location": FFMPEG_PATH,
+            "extractor_args": {"youtube": {"player_client": ["tv", "mweb"]}},
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -265,8 +268,8 @@ def download_video():
             "noplaylist": True,
             "format": fmt_string,
             "outtmpl": output_template,
-            "ffmpeg_location": os.path.join(BASE_DIR, "ffmpeg"),
-            "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+            "ffmpeg_location": FFMPEG_PATH,
+            "extractor_args": {"youtube": {"player_client": ["tv", "mweb"]}},
             "merge_output_format": "mp4",
         }
         expected_ext = "mp4"
@@ -361,12 +364,8 @@ def convert_media():
 
     file.save(input_path)
 
-    # Build ffmpeg command using the local binary downloaded via Vercel build script
-    local_ffmpeg = os.path.join(BASE_DIR, "ffmpeg")
-    # Fallback to system ffmpeg if the local one isn't found (for local dev)
-    ffmpeg_cmd = local_ffmpeg if os.path.exists(local_ffmpeg) else "ffmpeg"
-    
-    cmd = [ffmpeg_cmd, "-y", "-i", input_path]
+    # Build ffmpeg command using imageio-ffmpeg's guaranteed binary path
+    cmd = [FFMPEG_PATH, "-y", "-i", input_path]
 
     # Codec hints
     if target_format == "mp3":
