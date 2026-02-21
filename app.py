@@ -217,6 +217,7 @@ def download_video():
             "noplaylist": True,
             "format": "bestaudio/best",
             "outtmpl": output_template,
+            "ffmpeg_location": os.path.join(BASE_DIR, "ffmpeg"),
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -256,6 +257,7 @@ def download_video():
             "noplaylist": True,
             "format": fmt_string,
             "outtmpl": output_template,
+            "ffmpeg_location": os.path.join(BASE_DIR, "ffmpeg"),
             "merge_output_format": "mp4",
         }
         expected_ext = "mp4"
@@ -350,8 +352,12 @@ def convert_media():
 
     file.save(input_path)
 
-    # Build ffmpeg command
-    cmd = ["ffmpeg", "-y", "-i", input_path]
+    # Build ffmpeg command using the local binary downloaded via Vercel build script
+    local_ffmpeg = os.path.join(BASE_DIR, "ffmpeg")
+    # Fallback to system ffmpeg if the local one isn't found (for local dev)
+    ffmpeg_cmd = local_ffmpeg if os.path.exists(local_ffmpeg) else "ffmpeg"
+    
+    cmd = [ffmpeg_cmd, "-y", "-i", input_path]
 
     # Codec hints
     if target_format == "mp3":
