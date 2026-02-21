@@ -94,7 +94,7 @@ def get_info():
         "no_warnings": True,
         "skip_download": True,
         "noplaylist": True,
-        "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+        "extractor_args": {"youtube": {"player_client": ["ios", "android", "web"]}},
     }
 
     try:
@@ -225,7 +225,7 @@ def download_video():
             "format": "bestaudio/best",
             "outtmpl": output_template,
             "ffmpeg_location": os.path.join(BASE_DIR, "ffmpeg"),
-            "extractor_args": {"youtube": {"player_client": ["android", "web"]}},
+            "extractor_args": {"youtube": {"player_client": ["ios", "android", "web"]}},
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
