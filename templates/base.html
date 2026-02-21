@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}MediaFlow{% endblock %}</title>
+  <meta name="description"
+    content="{% block description %}MediaFlow — Download & Convert media instantly.{% endblock %}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=4" />
+</head>
+
+<body>
+
+  <!-- ===== HEADER / NAV ===== -->
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="/" class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">MediaFlow</span>
+      </a>
+      <nav class="nav-links">
+        <a href="/" class="{% if active_page == 'downloader' %}nav-active{% endif %}">⬇️ Downloader</a>
+        <a href="/converter" class="{% if active_page == 'converter' %}nav-active{% endif %}">🔄 Converter</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===== PAGE CONTENT ===== -->
+  {% block content %}{% endblock %}
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span class="logo"><span class="logo-icon">⚡</span> MediaFlow</span>
+      <p class="footer-note">For personal use only. Respect copyright laws.</p>
+    </div>
+  </footer>
+
+  <script src="{{ url_for('static', filename='main.js') }}?v=1"></script>
+</body>
+
+</html>

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}MediaFlow — Media Converter{% endblock %}
+{% block description %}Convert any video or audio file to a different format — MP4, MP3, WAV, MKV, AVI and more.{%
+endblock %}
+
+{% block content %}
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-bg-orb orb-1" style="background:radial-gradient(circle,#00d4ff,transparent 70%)"></div>
+    <div class="hero-bg-orb orb-2" style="background:radial-gradient(circle,#6c63ff,transparent 70%)"></div>
+    <div class="container hero-content">
+        <h1>Media Format<br /><span class="gradient-text">Converter</span></h1>
+        <p class="hero-sub">Upload any audio or video file from your computer and convert it to any format you need —
+            fast, free, and private.</p>
+        <div class="hero-badges">
+            <span class="badge">🎵 MP3 · AAC · WAV · OGG · M4A · FLAC</span>
+            <span class="badge">🎬 MP4 · MKV · AVI · MOV · WEBM · FLV</span>
+        </div>
+    </div>
+</section>
+
+<!-- ===== CONVERTER TOOL ===== -->
+<section class="section">
+    <div class="container">
+
+        <div class="card">
+
+            <!-- Drop Zone -->
+            <div id="cv-dropzone" class="dropzone" role="button" tabindex="0" aria-label="Upload file for conversion">
+                <div class="dropzone-inner">
+                    <div class="dropzone-icon">📁</div>
+                    <p class="dropzone-text">Drag &amp; drop your file here</p>
+                    <p class="dropzone-sub">or</p>
+                    <button class="btn-outline" id="cv-browse-btn" type="button">Browse File</button>
+                    <input type="file" id="cv-file-input" accept="video/*,audio/*" class="visually-hidden" />
+                </div>
+            </div>
+
+            <!-- Selected File Info -->
+            <div id="cv-file-info" class="file-info hidden">
+                <div class="file-icon">📄</div>
+                <div class="file-details">
+                    <span id="cv-file-name" class="file-name"></span>
+                    <span id="cv-file-size" class="file-size"></span>
+                </div>
+                <button id="cv-remove-file" class="btn-icon" aria-label="Remove file">✕</button>
+            </div>
+
+            <!-- Format Picker -->
+            <div id="cv-format-picker" class="format-picker hidden">
+                <p class="format-picker-label">Choose output format:</p>
+
+                <div class="format-section">
+                    <h4 class="format-section-title">🎵 Audio Formats</h4>
+                    <div class="format-grid">
+                        <button class="format-btn" data-format="mp3">MP3</button>
+                        <button class="format-btn" data-format="aac">AAC</button>
+                        <button class="format-btn" data-format="wav">WAV</button>
+                        <button class="format-btn" data-format="ogg">OGG</button>
+                        <button class="format-btn" data-format="m4a">M4A</button>
+                        <button class="format-btn" data-format="flac">FLAC</button>
+                    </div>
+                </div>
+                <div class="format-section">
+                    <h4 class="format-section-title">🎬 Video Formats</h4>
+                    <div class="format-grid">
+                        <button class="format-btn" data-format="mp4">MP4</button>
+                        <button class="format-btn" data-format="mkv">MKV</button>
+                        <button class="format-btn" data-format="avi">AVI</button>
+                        <button class="format-btn" data-format="mov">MOV</button>
+                        <button class="format-btn" data-format="webm">WEBM</button>
+                        <button class="format-btn" data-format="flv">FLV</button>
+                    </div>
+                </div>
+
+                <button id="cv-convert-btn" class="btn-download" disabled>
+                    <span class="btn-download-icon">🔄</span>
+                    <span class="btn-download-text">Convert &amp; Download</span>
+                    <span class="btn-spinner hidden" aria-hidden="true"></span>
+                </button>
+                <p id="cv-status" class="status-msg hidden"></p>
+            </div>
+
+        </div><!-- /card -->
+
+        <!-- How-to hint -->
+        <div class="hint-row">
+            <div class="hint-card">
+                <div class="hint-icon">1️⃣</div>
+                <p>Upload or drag &amp; drop your file</p>
+            </div>
+            <div class="hint-arrow">→</div>
+            <div class="hint-card">
+                <div class="hint-icon">2️⃣</div>
+                <p>Choose the output format</p>
+            </div>
+            <div class="hint-arrow">→</div>
+            <div class="hint-card">
+                <div class="hint-icon">3️⃣</div>
+                <p>Click <strong>Convert &amp; Download</strong></p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}MediaFlow — Video Downloader{% endblock %}
+{% block description %}Download videos from YouTube, Instagram, Facebook and TikTok in any resolution or as MP3.{%
+endblock %}
+
+{% block content %}
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+    <div class="hero-bg-orb orb-1"></div>
+    <div class="hero-bg-orb orb-2"></div>
+    <div class="container hero-content">
+        <h1>Universal<br /><span class="gradient-text">Video Downloader</span></h1>
+        <p class="hero-sub">Grab videos and audio from YouTube, Instagram, Facebook and TikTok — pick the exact quality
+            you want.</p>
+        <div class="hero-badges">
+            <span class="badge">🎬 YouTube</span>
+            <span class="badge">📸 Instagram</span>
+            <span class="badge">👍 Facebook</span>
+            <span class="badge">🎵 TikTok</span>
+        </div>
+    </div>
+</section>
+
+<!-- ===== DOWNLOADER TOOL ===== -->
+<section class="section">
+    <div class="container">
+
+        <div class="card">
+            <!-- URL Input -->
+            <div class="input-group" id="dl-input-group">
+                <div class="url-input-wrap">
+                    <span class="url-input-icon">🔗</span>
+                    <input type="url" id="dl-url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="off"
+                        spellcheck="false" />
+                    <button id="dl-fetch-btn" class="btn-primary" aria-label="Fetch video info">
+                        <span class="btn-text">Fetch</span>
+                        <span class="btn-spinner hidden" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <p id="dl-url-error" class="field-error hidden"></p>
+            </div>
+
+            <!-- Video Preview -->
+            <div id="dl-preview" class="video-preview hidden">
+                <img id="dl-thumb" src="" alt="Video thumbnail" class="thumb" />
+                <div class="video-meta">
+                    <h3 id="dl-title" class="video-title"></h3>
+                    <div class="meta-row">
+                        <span id="dl-uploader" class="meta-chip"></span>
+                        <span id="dl-platform" class="meta-chip platform-chip"></span>
+                        <span id="dl-duration" class="meta-chip"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download Options -->
+            <div id="dl-options" class="download-options hidden">
+                <div class="options-row">
+                    <div class="option-block">
+                        <label class="option-label">Type</label>
+                        <div class="toggle-group" role="group" aria-label="Download type">
+                            <button class="toggle-btn active" data-value="video" id="type-video">🎬 Video (MP4)</button>
+                            <button class="toggle-btn" data-value="audio" id="type-audio">🎵 Audio (MP3)</button>
+                        </div>
+                    </div>
+
+                    <div class="option-block" id="resolution-block">
+                        <label class="option-label" for="dl-resolution">Resolution</label>
+                        <div class="custom-select-wrap">
+                            <select id="dl-resolution" class="custom-select"></select>
+                            <span class="select-arrow">▾</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="dl-download-btn" class="btn-download">
+                    <span class="btn-download-icon">⬇</span>
+                    <span class="btn-download-text">Download</span>
+                    <span class="btn-spinner hidden" aria-hidden="true"></span>
+                </button>
+                <p id="dl-download-status" class="status-msg hidden"></p>
+            </div>
+        </div><!-- /card -->
+
+        <!-- How-to hint -->
+        <div class="hint-row">
+            <div class="hint-card">
+                <div class="hint-icon">1️⃣</div>
+                <p>Paste the video URL above</p>
+            </div>
+            <div class="hint-arrow">→</div>
+            <div class="hint-card">
+                <div class="hint-icon">2️⃣</div>
+                <p>Click <strong>Fetch</strong> to load info</p>
+            </div>
+            <div class="hint-arrow">→</div>
+            <div class="hint-card">
+                <div class="hint-icon">3️⃣</div>
+                <p>Pick quality &amp; click <strong>Download</strong></p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

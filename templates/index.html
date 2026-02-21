@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediaFlow — Video Downloader & Converter</title>
+    <meta name="description"
+        content="Download videos from YouTube, Instagram, Facebook and TikTok, or convert any media file to your preferred format — fast and free." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+
+    <!-- ===== HEADER / NAV ===== -->
+    <header class="site-header">
+        <div class="container nav-inner">
+            <a href="#" class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">MediaFlow</span>
+            </a>
+            <nav class="nav-links">
+                <a href="#downloader">Downloader</a>
+                <a href="#converter">Converter</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="hero-bg-orb orb-1"></div>
+        <div class="hero-bg-orb orb-2"></div>
+        <div class="container hero-content">
+            <h1>Download &amp; Convert<br /><span class="gradient-text">Any Media, Instantly</span></h1>
+            <p class="hero-sub">Grab videos from YouTube, Instagram, Facebook, and TikTok — or convert your media files
+                to any format you need.</p>
+            <div class="hero-badges">
+                <span class="badge">🎬 YouTube</span>
+                <span class="badge">📸 Instagram</span>
+                <span class="badge">👍 Facebook</span>
+                <span class="badge">🎵 TikTok</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SECTION 1: VIDEO DOWNLOADER ===== -->
+    <section id="downloader" class="section">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">⬇️</div>
+                <h2>Universal Video Downloader</h2>
+                <p>Paste any video link and choose your preferred quality and format.</p>
+            </div>
+
+            <div class="card">
+                <!-- URL Input -->
+                <div class="input-group" id="dl-input-group">
+                    <div class="url-input-wrap">
+                        <span class="url-input-icon">🔗</span>
+                        <input type="url" id="dl-url" placeholder="https://www.youtube.com/watch?v=..."
+                            autocomplete="off" spellcheck="false" />
+                        <button id="dl-fetch-btn" class="btn-primary" aria-label="Fetch video info">
+                            <span class="btn-text">Fetch</span>
+                            <span class="btn-spinner hidden" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <p id="dl-url-error" class="field-error hidden"></p>
+                </div>
+
+                <!-- Video Preview (hidden until fetched) -->
+                <div id="dl-preview" class="video-preview hidden">
+                    <img id="dl-thumb" src="" alt="Video thumbnail" class="thumb" />
+                    <div class="video-meta">
+                        <h3 id="dl-title" class="video-title"></h3>
+                        <div class="meta-row">
+                            <span id="dl-uploader" class="meta-chip"></span>
+                            <span id="dl-platform" class="meta-chip platform-chip"></span>
+                            <span id="dl-duration" class="meta-chip"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Download Options (hidden until fetched) -->
+                <div id="dl-options" class="download-options hidden">
+                    <div class="options-row">
+                        <div class="option-block">
+                            <label class="option-label" for="dl-type">Type</label>
+                            <div class="toggle-group" role="group" aria-label="Download type">
+                                <button class="toggle-btn active" data-value="video" id="type-video">🎬 Video
+                                    (MP4)</button>
+                                <button class="toggle-btn" data-value="audio" id="type-audio">🎵 Audio (MP3)</button>
+                            </div>
+                        </div>
+
+                        <div class="option-block" id="resolution-block">
+                            <label class="option-label" for="dl-resolution">Resolution</label>
+                            <div class="custom-select-wrap">
+                                <select id="dl-resolution" class="custom-select">
+                                    <!-- Populated dynamically -->
+                                </select>
+                                <span class="select-arrow">▾</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="dl-download-btn" class="btn-download">
+                        <span class="btn-download-icon">⬇</span>
+                        <span class="btn-download-text">Download</span>
+                        <span class="btn-spinner hidden" aria-hidden="true"></span>
+                    </button>
+                    <p id="dl-download-status" class="status-msg hidden"></p>
+                </div>
+            </div><!-- /card -->
+        </div>
+    </section>
+
+    <!-- ===== SECTION 2: MEDIA CONVERTER ===== -->
+    <section id="converter" class="section section-alt">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-icon">🔄</div>
+                <h2>Media Format Converter</h2>
+                <p>Upload any audio or video file and convert it to your desired format.</p>
+            </div>
+
+            <div class="card">
+                <!-- Drop Zone -->
+                <div id="cv-dropzone" class="dropzone" role="button" tabindex="0"
+                    aria-label="Upload file for conversion">
+                    <div class="dropzone-inner">
+                        <div class="dropzone-icon">📁</div>
+                        <p class="dropzone-text">Drag &amp; drop your file here</p>
+                        <p class="dropzone-sub">or</p>
+                        <button class="btn-outline" id="cv-browse-btn" type="button">Browse File</button>
+                        <input type="file" id="cv-file-input" accept="video/*,audio/*" class="visually-hidden" />
+                    </div>
+                </div>
+
+                <!-- Selected File Info -->
+                <div id="cv-file-info" class="file-info hidden">
+                    <div class="file-icon">📄</div>
+                    <div class="file-details">
+                        <span id="cv-file-name" class="file-name"></span>
+                        <span id="cv-file-size" class="file-size"></span>
+                    </div>
+                    <button id="cv-remove-file" class="btn-icon" aria-label="Remove file">✕</button>
+                </div>
+
+                <!-- Format Picker -->
+                <div id="cv-format-picker" class="format-picker hidden">
+                    <div class="format-section">
+                        <h4 class="format-section-title">🎵 Audio Formats</h4>
+                        <div class="format-grid">
+                            <button class="format-btn" data-format="mp3">MP3</button>
+                            <button class="format-btn" data-format="aac">AAC</button>
+                            <button class="format-btn" data-format="wav">WAV</button>
+                            <button class="format-btn" data-format="ogg">OGG</button>
+                            <button class="format-btn" data-format="m4a">M4A</button>
+                            <button class="format-btn" data-format="flac">FLAC</button>
+                        </div>
+                    </div>
+                    <div class="format-section">
+                        <h4 class="format-section-title">🎬 Video Formats</h4>
+                        <div class="format-grid">
+                            <button class="format-btn" data-format="mp4">MP4</button>
+                            <button class="format-btn" data-format="mkv">MKV</button>
+                            <button class="format-btn" data-format="avi">AVI</button>
+                            <button class="format-btn" data-format="mov">MOV</button>
+                            <button class="format-btn" data-format="webm">WEBM</button>
+                            <button class="format-btn" data-format="flv">FLV</button>
+                        </div>
+                    </div>
+
+                    <button id="cv-convert-btn" class="btn-download" disabled>
+                        <span class="btn-download-icon">🔄</span>
+                        <span class="btn-download-text">Convert &amp; Download</span>
+                        <span class="btn-spinner hidden" aria-hidden="true"></span>
+                    </button>
+                    <p id="cv-status" class="status-msg hidden"></p>
+                </div>
+
+            </div><!-- /card -->
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <span class="logo"><span class="logo-icon">⚡</span> MediaFlow</span>
+            <p class="footer-note">For personal use only. Respect copyright laws.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+
+</html>
