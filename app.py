@@ -97,8 +97,12 @@ def get_info():
         "no_warnings": True,
         "skip_download": True,
         "noplaylist": True,
-        "extractor_args": {"youtube": {"player_client": ["android", "ios", "android_vr"]}},
+        "extractor_args": {"youtube": {"player_client": ["tv", "mweb"]}},
     }
+
+    cookies_path = os.path.join(BASE_DIR, "cookies.txt")
+    if os.path.exists(cookies_path):
+        ydl_opts["cookiefile"] = cookies_path
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -237,6 +241,9 @@ def download_video():
                 }
             ],
         }
+        cookies_path = os.path.join(BASE_DIR, "cookies.txt")
+        if os.path.exists(cookies_path):
+            ydl_opts["cookiefile"] = cookies_path
         expected_ext = "mp3"
     else:
         # If we have an exact format_id (from the /api/info dropdown), use it directly.
@@ -272,6 +279,9 @@ def download_video():
             "extractor_args": {"youtube": {"player_client": ["tv", "mweb"]}},
             "merge_output_format": "mp4",
         }
+        cookies_path = os.path.join(BASE_DIR, "cookies.txt")
+        if os.path.exists(cookies_path):
+            ydl_opts["cookiefile"] = cookies_path
         expected_ext = "mp4"
 
 
