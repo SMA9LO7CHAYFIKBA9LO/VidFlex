@@ -68,6 +68,32 @@ def converter():
 
 
 # ---------------------------------------------------------------------------
+# Route: POST /api/upload-cookies  – save a cookies.txt file from the browser
+# ---------------------------------------------------------------------------
+@app.route("/api/upload-cookies", methods=["POST"])
+def upload_cookies():
+    if "cookies" not in request.files:
+        return jsonify({"error": "No file uploaded"}), 400
+    f = request.files["cookies"]
+    if not f.filename:
+        return jsonify({"error": "Empty filename"}), 400
+    save_path = os.path.join(BASE_DIR, "cookies.txt")
+    f.save(save_path)
+    return jsonify({"success": True, "message": "cookies.txt saved! Downloads will now use your credentials."})
+
+
+# ---------------------------------------------------------------------------
+# Route: GET /api/cookies-status  – check if cookies.txt is present
+# ---------------------------------------------------------------------------
+@app.route("/api/cookies-status", methods=["GET"])
+def cookies_status():
+    path = os.path.join(BASE_DIR, "cookies.txt")
+    exists = os.path.exists(path)
+    size = os.path.getsize(path) if exists else 0
+    return jsonify({"has_cookies": exists, "size_bytes": size})
+
+
+# ---------------------------------------------------------------------------
 # Helper: cleanup file after response is sent
 # ---------------------------------------------------------------------------
 def _delete_later(path: str, delay: int = 120):
