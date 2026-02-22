@@ -17,5 +17,10 @@
     ],
     "env": {
         "VERCEL": "1"
+    },
+    "functions": {
+        "app.py": {
+            "maxDuration": 60
+        }
     }
 }

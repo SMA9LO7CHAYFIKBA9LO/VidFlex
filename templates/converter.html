@@ -35,7 +35,14 @@ endblock %}
                     <p class="dropzone-sub">or</p>
                     <button class="btn-outline" id="cv-browse-btn" type="button">Browse File</button>
                     <input type="file" id="cv-file-input" accept="video/*,audio/*" class="visually-hidden" />
+                    <p style="margin-top:.6rem;font-size:.75rem;opacity:.45;">Max file size: 4 MB</p>
                 </div>
+            </div>
+
+            <!-- Size error banner -->
+            <div id="cv-size-error"
+                style="display:none;margin-top:.75rem;padding:.7rem 1rem;background:rgba(248,113,113,.12);border:1px solid rgba(248,113,113,.35);border-radius:.75rem;color:#f87171;font-size:.875rem;">
+                ⚠️ File is too large for the online converter (max 4 MB). Please use a smaller file.
             </div>
 
             <!-- Selected File Info -->
@@ -105,5 +112,39 @@ endblock %}
 
     </div>
 </section>
+
+<script>
+    // File-size guard: block uploads > 4 MB (Vercel free plan limit is 4.5 MB)
+    const MAX_BYTES = 4 * 1024 * 1024; // 4 MB
+
+    (function () {
+        const fileInput = document.getElementById('cv-file-input');
+        const sizeError = document.getElementById('cv-size-error');
+        const fileInfo = document.getElementById('cv-file-info');
+        const fmtPicker = document.getElementById('cv-format-picker');
+
+        function handleFile(file) {
+            sizeError.style.display = 'none';
+            if (file && file.size > MAX_BYTES) {
+                sizeError.style.display = 'block';
+                fileInfo.classList.add('hidden');
+                fmtPicker.classList.add('hidden');
+                fileInput.value = '';
+                return false;
+            }
+            return true;
+        }
+
+        fileInput.addEventListener('change', function () {
+            handleFile(this.files[0]);
+        });
+
+        const dropzone = document.getElementById('cv-dropzone');
+        dropzone.addEventListener('drop', function (e) {
+            const file = e.dataTransfer && e.dataTransfer.files[0];
+            if (file && !handleFile(file)) e.stopImmediatePropagation();
+        }, true);
+    })();
+</script>
 
 {% endblock %}
