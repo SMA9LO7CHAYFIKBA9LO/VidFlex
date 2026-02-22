@@ -226,6 +226,7 @@ def download_video():
             "noplaylist": True,
             "format": "bestaudio/best",
             "outtmpl": output_template,
+            "ffmpeg_location": FFMPEG_PATH,
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -265,6 +266,7 @@ def download_video():
             "noplaylist": True,
             "format": fmt_string,
             "outtmpl": output_template,
+            "ffmpeg_location": FFMPEG_PATH,
             "merge_output_format": "mp4",
         }
         expected_ext = "mp4"
@@ -359,8 +361,8 @@ def convert_media():
 
     file.save(input_path)
 
-    # Build ffmpeg command
-    cmd = ["ffmpeg", "-y", "-i", input_path]
+    # Build ffmpeg command using the bundled binary from imageio-ffmpeg
+    cmd = [FFMPEG_PATH, "-y", "-i", input_path]
 
     # Codec hints
     if target_format == "mp3":
