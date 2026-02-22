@@ -344,46 +344,46 @@ formatBtns.forEach(btn => {
 
 /* ---- Convert ---- */
 if (typeof cvConvertBtn !== 'undefined' && cvConvertBtn) {
-    cvConvertBtn.addEventListener("click", () => {
+    cvConvertBtn.addEventListener("click", async () => {
         if (!cvSelectedFile || !cvSelectedFormat) return;
 
         setLoading(cvConvertBtn, true);
         setInfo(cvStatus, `⏳ Converting to .${cvSelectedFormat.toUpperCase()}… please wait.`);
 
         try {
-            const form = document.createElement("form");
-            form.method = "POST";
-            form.action = `${API_BASE}/api/v2/convert`;
-            form.enctype = "multipart/form-data";
-            form.style.display = "none";
+            const fd = new FormData();
+            fd.append("file", cvSelectedFile);
+            fd.append("target_format", cvSelectedFormat);
 
-            const fileInput = document.createElement("input");
-            fileInput.type = "file";
-            fileInput.name = "file";
-            const dt = new DataTransfer();
-            dt.items.add(cvSelectedFile);
-            fileInput.files = dt.files;
+            const resp = await fetch(`${API_BASE}/api/v2/convert`, {
+                method: "POST",
+                body: fd,
+            });
 
-            const formatInput = document.createElement("input");
-            formatInput.type = "hidden";
-            formatInput.name = "target_format";
-            formatInput.value = cvSelectedFormat;
+            if (!resp.ok) {
+                let errMsg = `Server error ${resp.status}`;
+                try { const j = await resp.json(); errMsg = j.error || errMsg; } catch (_) { }
+                throw new Error(errMsg);
+            }
 
-            form.appendChild(fileInput);
-            form.appendChild(formatInput);
-            document.body.appendChild(form);
+            // Trigger a file download from the binary response
+            const blob = await resp.blob();
+            const contentDisp = resp.headers.get("Content-Disposition") || "";
+            const nameMatch = contentDisp.match(/filename\*?=(?:UTF-8'')?["']?([^"';\n]+)/i);
+            const filename = nameMatch ? decodeURIComponent(nameMatch[1]) : `converted.${cvSelectedFormat}`;
 
-            form.submit();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1000);
 
-            setTimeout(() => form.remove(), 100);
-
-            setTimeout(() => {
-                setSuccess(cvStatus, `✅ Converting to .${cvSelectedFormat.toUpperCase()} — check your Downloads folder!`);
-                setLoading(cvConvertBtn, false);
-            }, 2000);
-
+            setSuccess(cvStatus, `✅ Done! Saved as ${filename}`);
         } catch (err) {
             setError(cvStatus, "❌ " + err.message);
+        } finally {
             setLoading(cvConvertBtn, false);
         }
     });
