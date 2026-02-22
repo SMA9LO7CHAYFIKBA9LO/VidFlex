@@ -6,6 +6,9 @@ import subprocess
 from flask import Flask, request, jsonify, send_file, render_template
 from flask_cors import CORS
 import yt_dlp
+import imageio_ffmpeg
+
+FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
 
 
 def _strip_ansi(text: str) -> str:
@@ -26,8 +29,14 @@ def add_header(r):
 # Setup & Config
 # ---------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
-CONVERT_DIR = os.path.join(BASE_DIR, "conversions")
+
+if os.environ.get("VERCEL") == "1":
+    DOWNLOAD_DIR = "/tmp/downloads"
+    CONVERT_DIR  = "/tmp/conversions"
+else:
+    DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
+    CONVERT_DIR  = os.path.join(BASE_DIR, "conversions")
+
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 os.makedirs(CONVERT_DIR, exist_ok=True)
 
