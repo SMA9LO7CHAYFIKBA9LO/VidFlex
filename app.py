@@ -110,6 +110,32 @@ def _delete_later(path: str, delay: int = 120):
 
 
 # ---------------------------------------------------------------------------
+# Helper: inject YouTube authentication into yt-dlp options
+# Priority: 1) uploaded cookies.txt  2) live browser cookies  3) nothing
+# ---------------------------------------------------------------------------
+def _apply_cookies(ydl_opts: dict) -> dict:
+    # 1. Use manually uploaded cookies.txt if present
+    cookies_path = os.path.join(BASE_DIR, "cookies.txt")
+    if os.path.exists(cookies_path) and os.path.getsize(cookies_path) > 100:
+        ydl_opts["cookiefile"] = cookies_path
+        return ydl_opts
+
+    # 2. On local machines (not Vercel), try reading from the system browser.
+    #    yt-dlp supports: chrome, firefox, edge, safari, opera, brave, etc.
+    if os.environ.get("VERCEL") != "1":
+        for browser in ("chrome", "firefox", "edge"):
+            try:
+                # Validate the browser is readable without crashing yt-dlp
+                import yt_dlp.cookies as _ytcookies
+                ydl_opts["cookiesfrombrowser"] = (browser, None, None, None)
+                return ydl_opts
+            except Exception:
+                continue
+
+    return ydl_opts
+
+
+# ---------------------------------------------------------------------------
 # Route: GET /api/info  –  fetch video metadata + available formats
 # ---------------------------------------------------------------------------
 @app.route("/api/info", methods=["GET"])
@@ -126,9 +152,7 @@ def get_info():
         "extractor_args": {"youtube": {"player_client": ["tv", "mweb"]}},
     }
 
-    cookies_path = os.path.join(BASE_DIR, "cookies.txt")
-    if os.path.exists(cookies_path):
-        ydl_opts["cookiefile"] = cookies_path
+    _apply_cookies(ydl_opts)
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -267,9 +291,7 @@ def download_video():
                 }
             ],
         }
-        cookies_path = os.path.join(BASE_DIR, "cookies.txt")
-        if os.path.exists(cookies_path):
-            ydl_opts["cookiefile"] = cookies_path
+        _apply_cookies(ydl_opts)
         expected_ext = "mp3"
     else:
         # If we have an exact format_id (from the /api/info dropdown), use it directly.
@@ -305,9 +327,7 @@ def download_video():
             "extractor_args": {"youtube": {"player_client": ["tv", "mweb"]}},
             "merge_output_format": "mp4",
         }
-        cookies_path = os.path.join(BASE_DIR, "cookies.txt")
-        if os.path.exists(cookies_path):
-            ydl_opts["cookiefile"] = cookies_path
+        _apply_cookies(ydl_opts)
         expected_ext = "mp4"
 
 
