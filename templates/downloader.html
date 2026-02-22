@@ -27,29 +27,6 @@ endblock %}
 <section class="section">
     <div class="container">
 
-        <!-- ===== COOKIE AUTH PANEL ===== -->
-        <div class="card" id="cookie-panel" style="margin-bottom:1.5rem;border:1px dashed rgba(255,255,255,0.15);">
-            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
-                <div>
-                    <div style="font-weight:600;font-size:1rem;margin-bottom:.25rem;">🔑 YouTube Authentication</div>
-                    <div style="font-size:.85rem;opacity:.65;" id="cookie-status-text">Checking...</div>
-                </div>
-                <label for="cookie-file-input" id="cookie-upload-label" class="btn-primary"
-                    style="cursor:pointer;padding:.55rem 1.2rem;font-size:.9rem;display:none;">
-                    📂 Upload cookies.txt
-                </label>
-                <input type="file" id="cookie-file-input" accept=".txt" style="display:none;" />
-                <span id="cookie-ok-badge"
-                    style="display:none;background:rgba(34,197,94,.15);color:#22c55e;border:1px solid rgba(34,197,94,.4);border-radius:2rem;padding:.35rem 1rem;font-size:.85rem;font-weight:600;">✅
-                    Authenticated</span>
-            </div>
-            <div id="cookie-upload-hint" style="margin-top:.75rem;font-size:.8rem;opacity:.5;display:none;">
-                Export your YouTube cookies with the <strong>Get cookies.txt LOCALLY</strong> Chrome extension, then
-                upload the file here.
-            </div>
-            <div id="cookie-upload-result" style="margin-top:.5rem;font-size:.85rem;display:none;"></div>
-        </div>
-
         <div class="card">
             <!-- URL Input -->
             <div class="input-group" id="dl-input-group">
@@ -127,57 +104,5 @@ endblock %}
 
     </div>
 </section>
-
-<script>
-    (function () {
-        const statusText = document.getElementById('cookie-status-text');
-        const uploadLabel = document.getElementById('cookie-upload-label');
-        const uploadHint = document.getElementById('cookie-upload-hint');
-        const okBadge = document.getElementById('cookie-ok-badge');
-        const fileInput = document.getElementById('cookie-file-input');
-        const resultEl = document.getElementById('cookie-upload-result');
-
-        function showAuthenticated() {
-            statusText.textContent = 'Your YouTube session is active. Downloads should work without restrictions.';
-            okBadge.style.display = 'inline-flex';
-            uploadLabel.style.display = 'none';
-            uploadHint.style.display = 'none';
-        }
-        function showUnauthenticated() {
-            statusText.textContent = 'No cookies found. YouTube may block some downloads. Upload your cookies.txt to fix this.';
-            uploadLabel.style.display = 'inline-flex';
-            uploadHint.style.display = 'block';
-            okBadge.style.display = 'none';
-        }
-
-        fetch('/api/cookies-status')
-            .then(r => r.json())
-            .then(d => { d.has_cookies && d.size_bytes > 100 ? showAuthenticated() : showUnauthenticated(); })
-            .catch(() => showUnauthenticated());
-
-        fileInput.addEventListener('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-            const fd = new FormData();
-            fd.append('cookies', file);
-            resultEl.style.display = 'block';
-            resultEl.style.color = '#94a3b8';
-            resultEl.textContent = 'Uploading...';
-            fetch('/api/upload-cookies', { method: 'POST', body: fd })
-                .then(r => r.json())
-                .then(d => {
-                    if (d.success) {
-                        resultEl.style.color = '#22c55e';
-                        resultEl.textContent = '✅ ' + d.message;
-                        showAuthenticated();
-                    } else {
-                        resultEl.style.color = '#f87171';
-                        resultEl.textContent = '❌ ' + (d.error || 'Upload failed');
-                    }
-                })
-                .catch(() => { resultEl.style.color = '#f87171'; resultEl.textContent = '❌ Network error'; });
-        });
-    })();
-</script>
 
 {% endblock %}

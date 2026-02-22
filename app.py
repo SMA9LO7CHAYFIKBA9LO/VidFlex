@@ -6,9 +6,6 @@ import subprocess
 from flask import Flask, request, jsonify, send_file, render_template
 from flask_cors import CORS
 import yt_dlp
-import imageio_ffmpeg
-
-FFMPEG_PATH = imageio_ffmpeg.get_ffmpeg_exe()
 
 
 def _strip_ansi(text: str) -> str:
@@ -29,14 +26,8 @@ def add_header(r):
 # Setup & Config
 # ---------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-if os.environ.get("VERCEL") == "1":
-    DOWNLOAD_DIR = "/tmp/downloads"
-    CONVERT_DIR = "/tmp/conversions"
-else:
-    DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
-    CONVERT_DIR = os.path.join(BASE_DIR, "conversions")
-
+DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
+CONVERT_DIR = os.path.join(BASE_DIR, "conversions")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 os.makedirs(CONVERT_DIR, exist_ok=True)
 
@@ -68,32 +59,6 @@ def converter():
 
 
 # ---------------------------------------------------------------------------
-# Route: POST /api/upload-cookies  – save a cookies.txt file from the browser
-# ---------------------------------------------------------------------------
-@app.route("/api/upload-cookies", methods=["POST"])
-def upload_cookies():
-    if "cookies" not in request.files:
-        return jsonify({"error": "No file uploaded"}), 400
-    f = request.files["cookies"]
-    if not f.filename:
-        return jsonify({"error": "Empty filename"}), 400
-    save_path = os.path.join(BASE_DIR, "cookies.txt")
-    f.save(save_path)
-    return jsonify({"success": True, "message": "cookies.txt saved! Downloads will now use your credentials."})
-
-
-# ---------------------------------------------------------------------------
-# Route: GET /api/cookies-status  – check if cookies.txt is present
-# ---------------------------------------------------------------------------
-@app.route("/api/cookies-status", methods=["GET"])
-def cookies_status():
-    path = os.path.join(BASE_DIR, "cookies.txt")
-    exists = os.path.exists(path)
-    size = os.path.getsize(path) if exists else 0
-    return jsonify({"has_cookies": exists, "size_bytes": size})
-
-
-# ---------------------------------------------------------------------------
 # Helper: cleanup file after response is sent
 # ---------------------------------------------------------------------------
 def _delete_later(path: str, delay: int = 120):
@@ -110,32 +75,6 @@ def _delete_later(path: str, delay: int = 120):
 
 
 # ---------------------------------------------------------------------------
-# Helper: inject YouTube authentication into yt-dlp options
-# Priority: 1) uploaded cookies.txt  2) live browser cookies  3) nothing
-# ---------------------------------------------------------------------------
-def _apply_cookies(ydl_opts: dict) -> dict:
-    # 1. Use manually uploaded cookies.txt if present
-    cookies_path = os.path.join(BASE_DIR, "cookies.txt")
-    if os.path.exists(cookies_path) and os.path.getsize(cookies_path) > 100:
-        ydl_opts["cookiefile"] = cookies_path
-        return ydl_opts
-
-    # 2. On local machines (not Vercel), try reading from the system browser.
-    #    yt-dlp supports: chrome, firefox, edge, safari, opera, brave, etc.
-    if os.environ.get("VERCEL") != "1":
-        for browser in ("chrome", "firefox", "edge"):
-            try:
-                # Validate the browser is readable without crashing yt-dlp
-                import yt_dlp.cookies as _ytcookies
-                ydl_opts["cookiesfrombrowser"] = (browser, None, None, None)
-                return ydl_opts
-            except Exception:
-                continue
-
-    return ydl_opts
-
-
-# ---------------------------------------------------------------------------
 # Route: GET /api/info  –  fetch video metadata + available formats
 # ---------------------------------------------------------------------------
 @app.route("/api/info", methods=["GET"])
@@ -149,10 +88,7 @@ def get_info():
         "no_warnings": True,
         "skip_download": True,
         "noplaylist": True,
-        "extractor_args": {"youtube": {"player_client": ["tv", "mweb"]}},
     }
-
-    _apply_cookies(ydl_opts)
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
@@ -281,8 +217,6 @@ def download_video():
             "noplaylist": True,
             "format": "bestaudio/best",
             "outtmpl": output_template,
-            "ffmpeg_location": FFMPEG_PATH,
-            "extractor_args": {"youtube": {"player_client": ["tv", "mweb"]}},
             "postprocessors": [
                 {
                     "key": "FFmpegExtractAudio",
@@ -291,7 +225,6 @@ def download_video():
                 }
             ],
         }
-        _apply_cookies(ydl_opts)
         expected_ext = "mp3"
     else:
         # If we have an exact format_id (from the /api/info dropdown), use it directly.
@@ -323,11 +256,8 @@ def download_video():
             "noplaylist": True,
             "format": fmt_string,
             "outtmpl": output_template,
-            "ffmpeg_location": FFMPEG_PATH,
-            "extractor_args": {"youtube": {"player_client": ["tv", "mweb"]}},
             "merge_output_format": "mp4",
         }
-        _apply_cookies(ydl_opts)
         expected_ext = "mp4"
 
 
@@ -420,8 +350,8 @@ def convert_media():
 
     file.save(input_path)
 
-    # Build ffmpeg command using imageio-ffmpeg's guaranteed binary path
-    cmd = [FFMPEG_PATH, "-y", "-i", input_path]
+    # Build ffmpeg command
+    cmd = ["ffmpeg", "-y", "-i", input_path]
 
     # Codec hints
     if target_format == "mp3":
